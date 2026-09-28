@@ -3,19 +3,7 @@
 #include <algorithm>
 using namespace std;
 Image img;
-void InvertImage() {
-    img.loadNewImage("mario33.jpeg");
-    for (int i=0;i<img.width;i++) {
-        for (int j=0;j<img.height;j++) {
-            for (int k=0;k<3;k++) {
-               img(i,j,k)=255-img(i,j,k);
 
-            }
-        }
-
-    }
-    img.saveImage("Newmario33.jpeg");
-}
 void LightenDarkenImage(bool isLighten) {
     img.loadNewImage("house4.jpeg");
     for (int i=0;i<img.width;i++) {
@@ -52,31 +40,16 @@ void CropImage() {
     }
     cutted.saveImage("Newbaby0.jpeg");
 }
-void PurpleFilterImage() {
-    img.loadNewImage("luffy0.jpeg");
-    for (int i=0;i<img.width;i++) {
-        for (int j=0;j<img.height;j++) {
 
-            img(i,j,0)=min(255,(int)(img(i,j,0)*1.05));
-            img (i,j,1)=min(255,(int)(img(i,j,1)*0.82));
-            img(i,j,2)=min(255,(int)(img(i,j,2)*1.12));
-
-        }
-    }
-    img.saveImage("Newluffy0.jpeg");
-}
 int main() {
      cout <<"Select Your Choice:"<<endl;
-     cout <<"3. Invert Image"<<endl;
+
      cout<<"7. Darken Or Lighten Image"<<endl;
      cout<<"11. Crop Image"<<endl;
-     cout<<"15. Purple Filter Image"<<endl;
+
      int choice; cin>>choice;
      switch(choice) {
-         case 3:
 
-             InvertImage();
-             break;
          case 7:
              cout<<"1. lighten"<<endl;
              cout<<"2. darken"<<endl;
@@ -88,9 +61,6 @@ int main() {
          case 11:
          CropImage();
          break;
-             case 15:
-             PurpleFilterImage();
-             break;
 
          default:
              cout<<"invalid Choice"<<endl;

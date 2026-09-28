@@ -38,7 +38,7 @@ void frame() {
     f4 .saveImage("lteeeppppppe.bmp");
 }
 
-void f8() {
+void resize() {
      Image ref8("img.png");
 
      int newheight , newwidth;
@@ -61,58 +61,6 @@ void f8() {
      newf8.saveImage("imgnewww.png");
  }
 
-void bluur() {
-    Image f12("fruit.bmp");
-    Image blur(f12.width,f12.height) ;
-    int m[13][13];
-    for (int i = 0; i < f12.height; i++) {
-        for (int j = 0; j < f12.width; j++) {
-            for (int k = 0; k < 3; k++) {
-                int sum = 0;
-                for (int x = -1; x <= 11; x++) {
-                    for (int y = -1; y <= 11; y++) {
-                        if (x+i>=0 && x+i < f12.height && y+j < f12.width && y+j >=0 ) {
-                            sum += f12.getPixel(j+y,i+x,k);
-                        }
-                    }
-                }
-                int average = sum / 169 ;
-                blur.getPixel(j,i,k) = average;
-            }
-        }
-    }
-    blur.saveImage("oooooo.bmp");
-
-}
 
 
-void samurai_red(){
-    Image f16("samurai.jpg");
-    for (int i=0;i<f16.width;i++) {
-        for (int j=0;j<f16.height;j++) {
-            int r = f16(i , j , 0);
-            int g = f16(i , j , 1);
-            int b = f16(i , j , 2);
-            int blackcol = ((r+g+b)/3) ;
-
-            int newr = 255;          //max(0, min(255,(int)(blackcol * 1.2) + 60));
-            int newg = 255-blackcol; //max(0, min(255,(int)(blackcol * 1.1)+10 ));
-            int newb = 255-blackcol; //max(0, min(255,(int)(blackcol * 0.5)-20 ));
-
-            f16(i, j, 0) = newr;
-            f16(i, j, 1) = newg;
-            f16(i,j,2) = newb;
-
-        }
-    }
-    f16.saveImage("samurai_f16.jpg");
-
-}
-
-int main() {
-    int choice ;
-    cout<<"Enter choice: ";
-    cin>>choice;
-
-}
 

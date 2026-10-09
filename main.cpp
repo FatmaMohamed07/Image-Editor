@@ -4,7 +4,7 @@
         Image Processing - Console Application
 ====================================================
 
-Section: S15, S16 (Monday at 11.15 am)*
+Section: S15, S16 (Monday at 11.15 am)
 
 Team Members:
 1. Rana Amr Mohamed Ismail Elgendy        - ID: 20250231
@@ -32,6 +32,8 @@ save the modified image, load another image, and exit the program.
 #include <cstdlib>
 #include <complex.h>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 #include "Image_Class.h"
 using namespace std;
 
@@ -102,6 +104,15 @@ void black_and_white(Image& image)
     }
 }
 
+void InvertImage(Image& image) {
+    for (int i = 0; i < image.width; i++) {
+        for (int j = 0; j < image.height; j++) {
+            for (int k = 0; k < 3; k++) {
+                image(i, j, k) = 255 - image(i, j, k);
+            }
+        }
+    }
+}
 void frame(Image &image) {
 
     int n = 40;
@@ -288,6 +299,33 @@ void resize(Image& image) {
     image = newf8;
 }
 
+void detect_image(Image& image){
+    black_and_white(image);
+
+    Image result(image.width, image.height);
+    for (int y = 0; y < image.height - 1; y++){
+        for (int x = 0; x < image.width - 1; x++){
+            int current = image.getPixel(x, y, 0);
+            int right = image.getPixel(x + 1, y, 0);
+            int bottom = image.getPixel(x, y + 1, 0);
+
+            if (current != right || current != bottom){
+                result.setPixel(x, y, 0, 0);
+                result.setPixel(x, y, 1, 0);
+                result.setPixel(x, y, 2, 0);
+            }
+
+            else{
+                result.setPixel(x, y, 0, 255);
+                result.setPixel(x, y, 1, 255);
+                result.setPixel(x, y, 2, 255);
+            }
+        }
+    }
+
+    image = result;
+}
+
 void CropImage(Image &image) {
 
     int x, y, w, h;
@@ -316,6 +354,176 @@ void CropImage(Image &image) {
     }
 
     image = cutted;
+}
+
+void old_tv_effect(Image& image){
+    srand(time(0));
+
+    for (int y = 0; y < image.height; y++){
+        for (int x = 0; x < image.width; x++){
+            int R = image.getPixel(x, y, 0);
+            int G = image.getPixel(x, y, 1);
+            int B = image.getPixel(x, y, 2);
+
+            R = R * 80 / 100;
+            G = G * 80 / 100;
+            B = B * 80 / 100;
+
+            int noise = rand() % 21 - 10;
+
+            R += noise;
+            G += noise;
+            B += noise;
+
+            if (y % 2 == 0){
+                R = R * 70 / 100;
+                G = G * 70 / 100;
+                B = B * 70 / 100;
+            }
+
+            if (R < 0) R = 0;
+            if (R > 255) R = 255;
+
+            if (G < 0) G = 0;
+            if (G > 255) G = 255;
+
+            if (B < 0) B = 0;
+            if (B > 255) B = 255;
+
+            image.setPixel(x, y, 0, R);
+            image.setPixel(x, y, 1, G);
+            image.setPixel(x, y, 2, B);
+        }
+    }
+}
+
+void PurpleFilterImage(Image& img) {
+    for (int i=0;i<img.width;i++) {
+        for (int j=0;j<img.height;j++) {
+            img(i,j,0)=min(255,(int)(img(i,j,0)*1.05));
+            img (i,j,1)=min(255,(int)(img(i,j,1)*0.82));
+            img(i,j,2)=min(255,(int)(img(i,j,2)*1.12));
+        }
+    }
+}
+
+void skew_image(Image& image)
+{
+    double angle;
+
+    cout << "Enter skew angle: ";
+    cin >> angle;
+
+    double rad = angle * 3.14159265359 / 180.0;
+
+    int maxShift = abs((int)(image.height * tan(rad)));
+
+    int newWidth = image.width + maxShift;
+
+    Image skewed(newWidth, image.height);
+
+    for (int y = 0; y < skewed.height; y++)
+    {
+        for (int x = 0; x < skewed.width; x++)
+        {
+            skewed.setPixel(x, y, 0, 255);
+            skewed.setPixel(x, y, 1, 255);
+            skewed.setPixel(x, y, 2, 255);
+        }
+    }
+
+    for (int y = 0; y < image.height; y++)
+    {
+        int shift = (int)((image.height - 1 - y) * tan(rad));
+
+        for (int x = 0; x < image.width; x++)
+        {
+            int newX = x + shift;
+
+            if (newX >= 0 && newX < skewed.width)
+            {
+                for (int c = 0; c < 3; c++)
+                {
+                    skewed.setPixel(
+                        newX,
+                        y,
+                        c,
+                        image.getPixel(x, y, c)
+                    );
+                }
+            }
+        }
+    }
+
+    image = skewed;
+}
+
+Image newimage;
+void oilpainting(const Image&image) {
+    int matrix[7][7];
+
+    newimage = Image(image.width, image.height);
+    for (int i = 0 ; i < image.width-7 ; i++) {
+        for (int j = 0 ; j < image.height-7; j++) {
+            int frequency[256]={0};
+
+                for (int x = 0 ; x < 7 ; x++) {
+                    for (int y = 0 ; y < 7; y++ ) {
+
+                        int row = i + x ;
+                        int col = j + y ;
+                        int r =image(row ,col,0);
+                        int g =image(row,col ,1);
+                        int b =image(row ,col ,2);
+                        int intesity =(r+g+b)/3;
+                        matrix[x][y] = intesity;
+                        frequency[intesity]++;
+                    }
+                }
+
+                int maxfreq = 0;
+                int d = 0;
+                for (int t = 0 ; t < 256;t++) {
+                    if (frequency[t] > maxfreq) {
+                        maxfreq = frequency[t];
+                        d = t ;
+                    }
+                }
+                int newr = 0 , newg = 0 , newb = 0;
+                for (int x = 0 ; x < 7 ; x++) {
+                    for (int y = 0 ; y < 7; y++ ) {
+                        int row = i + x ;
+                        int col = j + y ;
+
+                        int r =image(row ,col ,0);
+                        int g =image(row, col,1);
+                        int b =image(row ,col ,2);
+                        int intesity =(r+g+b)/3;
+
+                        if (intesity == d ) {
+                            newr = r ;
+                            newg = g ;
+                            newb = b ;
+                        }
+
+                    }
+                }
+
+                newimage(i+1,j+1,0)= newr;
+                newimage(i+1,j+1,1)= newg;
+                newimage(i+1,j+1,2)= newb;
+            }
+        }
+}
+
+void loadImage(Image &image, string &filename) {
+
+    cout << "Enter image name: ";
+    cin >> filename;
+
+    if (image.loadNewImage(filename)) {
+        cout<<"Image successfully loaded"<<endl;
+    }
 }
 
 bool saveImage(Image &image, string &filename) {
@@ -349,53 +557,50 @@ bool saveImage(Image &image, string &filename) {
     return false;
 }
 
-void loadImage(Image &image, string &filename) {
-
-    cout << "Enter image name: ";
-    cin >> filename;
-
-    if (image.loadNewImage(filename)) {
-        cout<<"Image successfully loaded"<<endl;
-    }
-}
 
 
-
-int main() {
-
+int main() 
+{
     string filename;
 
     Image image;
 
     loadImage(image, filename);
 
-    while (true) {
-
+    while (true) 
+    {
         cout<<" <<<<< Filters >>>>> "<<endl;
         cout<<"enter,your filter"<<endl;
 
         cout<<"1. GrayScale"<<endl;
         cout<<"2. Black_and_White"<<endl;
+        cout<<"3. Invert Image"<< endl;
         cout<<"4.Frame"<<endl;
         cout<<"5. Flip"<<endl;
         cout<<"6. Rotate"<<endl;
         cout<<"7. Darken and Lighten"<<endl;
         cout<<"8. Resize"<<endl;
+        cout<<"10. Detect Image Edges"<< endl;
         cout<<"11. Crop Image"<<endl;
+        cout<<"14. Old TV Effect"<< endl;
+        cout<<"15. Purple Filter"<< endl;
+        cout<<"17. Image Skewing"<<endl;
+        cout<<"18. Oil Painting" <<endl;
         cout<<"19. save"<<endl;
         cout<<"20. Exit "<<endl;
 
         int choice;
         cin>>choice;
 
-        switch (choice) {
-
+        switch (choice) 
+        {
             case 1:
                 grayScale(image);
 
                 break;
 
-            case 5: {
+            case 5: 
+            {
                 cout<<"1. Vertical"<<endl;
                 cout<<"2. Horizontal"<<endl;
 
@@ -419,6 +624,10 @@ int main() {
                 black_and_white(image);
                 break;
 
+            case 3:
+                InvertImage(image);
+                break;
+
             case 4:
                 frame(image);
                 break;
@@ -427,8 +636,8 @@ int main() {
                 rotate_image(image);
                 break;
 
-            case 7: {
-
+            case 7: 
+            {
                 cout<<"1. lighten"<<endl;
                 cout<<"2. darken"<<endl;
                 cout<<"choose 1 or 2"<<endl;
@@ -450,8 +659,29 @@ int main() {
                 resize(image);
                 break;
 
+            case 10:
+                detect_image(image);
+                break;
+
             case 11:
                 CropImage(image);
+                break;
+
+            case 14:
+                old_tv_effect(image);
+                break;    
+
+            case 15:
+                PurpleFilterImage(image);
+                break;    
+
+            case 17:
+                skew_image(image);
+                break;
+
+            case 18:
+                oilpainting(image);
+                image = newimage;
                 break;
 
             case 19:

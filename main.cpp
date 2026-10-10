@@ -356,6 +356,30 @@ void CropImage(Image &image) {
     image = cutted;
 }
 
+void bluur() {
+    Image f12("fruit.bmp");
+    Image blur(f12.width,f12.height) ;
+    int m[13][13];
+    for (int i = 0; i < f12.height; i++) {
+        for (int j = 0; j < f12.width; j++) {
+            for (int k = 0; k < 3; k++) {
+                int sum = 0;
+                for (int x = -1; x <= 11; x++) {
+                    for (int y = -1; y <= 11; y++) {
+                        if (x+i>=0 && x+i < f12.height && y+j < f12.width && y+j >=0 ) {
+                            sum += f12.getPixel(j+y,i+x,k);
+                        }
+                    }
+                }
+                int average = sum / 169 ;
+                blur.getPixel(j,i,k) = average;
+            }
+        }
+    }
+    blur.saveImage("oooooo.bmp");
+
+}
+
 void old_tv_effect(Image& image){
     srand(time(0));
 
@@ -405,6 +429,29 @@ void PurpleFilterImage(Image& img) {
             img(i,j,2)=min(255,(int)(img(i,j,2)*1.12));
         }
     }
+}
+
+void samurai_red(){
+    Image f16("samurai.jpg");
+    for (int i=0;i<f16.width;i++) {
+        for (int j=0;j<f16.height;j++) {
+            int r = f16(i , j , 0);
+            int g = f16(i , j , 1);
+            int b = f16(i , j , 2);
+            int blackcol = ((r+g+b)/3) ;
+
+            int newr = 255;          //max(0, min(255,(int)(blackcol * 1.2) + 60));
+            int newg = 255-blackcol; //max(0, min(255,(int)(blackcol * 1.1)+10 ));
+            int newb = 255-blackcol; //max(0, min(255,(int)(blackcol * 0.5)-20 ));
+
+            f16(i, j, 0) = newr;
+            f16(i, j, 1) = newg;
+            f16(i,j,2) = newb;
+
+        }
+    }
+    f16.saveImage("samurai_f16.jpg");
+
 }
 
 void skew_image(Image& image)
@@ -582,8 +629,10 @@ int main()
         cout<<"8. Resize"<<endl;
         cout<<"10. Detect Image Edges"<< endl;
         cout<<"11. Crop Image"<<endl;
-        cout<<"14. Old TV Effect"<< endl;
-        cout<<"15. Purple Filter"<< endl;
+        cout<<"12. Blur Images"<<endl;
+        cout<<"14. Old TV Effect"<<endl;
+        cout<<"15. Purple Filter"<<endl;
+        cout<<"16. Samurai Red"<<endl;
         cout<<"17. Image Skewing"<<endl;
         cout<<"18. Oil Painting" <<endl;
         cout<<"19. save"<<endl;
@@ -667,6 +716,10 @@ int main()
                 CropImage(image);
                 break;
 
+            case 12:
+                bluur();
+                break;
+
             case 14:
                 old_tv_effect(image);
                 break;    
@@ -674,6 +727,10 @@ int main()
             case 15:
                 PurpleFilterImage(image);
                 break;    
+
+            case 16:
+                samurai_red();
+                break;
 
             case 17:
                 skew_image(image);

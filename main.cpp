@@ -1,6 +1,6 @@
 /*
 ====================================================
-        CS213 - Assignment 1 - Part 1
+        CS213 - Assignment 1    
         Image Processing - Console Application
 ====================================================
 
@@ -576,13 +576,8 @@ void samurai_red(){
 
 }
 
-void skew_image(Image& image)
+void skew_image(Image& image, double angle)
 {
-    double angle;
-
-    cout << "Enter skew angle: ";
-    cin >> angle;
-
     double rad = angle * 3.14159265359 / 180.0;
 
     int maxShift = abs((int)(image.height * tan(rad)));

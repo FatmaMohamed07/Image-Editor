@@ -4,28 +4,37 @@
         Image Processing - Console Application
 ====================================================
 
-Section: S15, S16 (Monday at 11.15 am)
+Team Members and Assigned Filters:
 
-Team Members:
-1. Rana Amr Mohamed Ismail Elgendy        - ID: 20250231
-2. Fatma Mohamed Hassan Salama            - ID: 20250464
-3. Menna talla Khaled Said                - ID: 20250672
-4. Menna Hosam Shahat Farag               - ID: 20251433
+1. Rana Amr Ismail - ID: 20250231 - Sections: S7, S8
+   Filter 1  - Grayscale Conversion
+   Filter 5  - Flip Image (Horizontal and Vertical)
+   Filter 9  - Merge Images
+   Filter 13 - Sunlight Filter
 
-Filters:
-1. Filter 1  - Grayscale Conversion                  - Rana Amr Mohamed Ismail Elgendy
-2. Filter 2  - Black and White                       - Fatma Mohamed Hassan Salama
-3. Filter 4  - Adding a Frame to the Picture         - Menna Hosam Shahat Farag
-4. Filter 5  - Flip Image                            - Rana Amr Mohamed Ismail Elgendy
-5. Filter 6  - Rotate Image                          - Fatma Mohamed Hassan Salama
-6. Filter 7  - Darken and Lighten Image              - Menna talla Khaled Said
-7. Filter 8  - Resizing Images                       - Menna Hosam Shahat Farag
-8. Filter 11 - Crop Images                           - Menna talla Khaled Said
+2. Fatma Mohamed Hassan - ID: 20250464 - Sections: S15, S16
+   Filter 2  - Black and White
+   Filter 6  - Rotate Image
+   Filter 10 - Detect Image Edges
+   Filter 14 - Old TV Effect
+
+3. Menna Khaled Said - ID: 20250672 - Sections: S7, S8
+   Filter 3  - Invert Image
+   Filter 7  - Darken and Lighten Image
+   Filter 11 - Crop Image
+   Filter 15 - Purple Filter
+
+4. Menna Hossam Shahat - ID: 20251433 - Sections: S37, S38
+   Filter 4  - Adding a Frame to the Picture
+   Filter 8  - Resizing Images
+   Filter 12 - Blur Filter
+   Filter 16 - Samurai Red
 
 Description:
 This program is a console-based image processing application.
 It allows the user to load an image, apply different filters,
 save the modified image, load another image, and exit the program.
+
 ====================================================
 */
 
@@ -299,6 +308,103 @@ void resize(Image& image) {
     image = newf8;
 }
 
+Image merge(Image &image1, Image &image2) {
+
+    if (image1.width == image2.width and image1.height == image2.height) {
+
+        Image imgCopy(image1.width, image1.height);
+
+        for (int i = 0; i < image1.width; i++) {
+            for (int j = 0; j < image1.height; j++) {
+                for (int k = 0; k < image1.channels; k++) {
+                    unsigned int avgColor =
+                        (image1(i,j,k) + image2(i,j,k)) / 2;
+
+                    imgCopy(i,j,k) = avgColor;
+                }
+            }
+        }
+
+        return imgCopy;
+    }
+
+    cout << "1. Resize smaller image" << endl;
+    cout << "2. Merge common area" << endl;
+    cout << "Choose your choice: ";
+
+    int choice;
+    cin >> choice;
+
+    switch (choice) {
+
+        case 1: {
+            int maxWidth = max(image1.width, image2.width);
+            int maxHeight = max(image1.height, image2.height);
+
+            Image resizedImage1(maxWidth, maxHeight);
+            Image resizedImage2(maxWidth, maxHeight);
+
+            for (int i = 0; i < maxWidth; i++) {
+                for (int j = 0; j < maxHeight; j++) {
+                    for (int k = 0; k < image1.channels; k++) {
+                        int oldX = i * image1.width / maxWidth;
+                        int oldY = j * image1.height / maxHeight;
+                        resizedImage1(i,j,k) = image1(oldX,oldY,k);
+                    }
+                }
+            }
+
+            for (int i = 0; i < maxWidth; i++) {
+                for (int j = 0; j < maxHeight; j++) {
+                    for (int k = 0; k < image2.channels; k++) {
+                        int oldX = i * image2.width / maxWidth;
+                        int oldY = j * image2.height / maxHeight;
+                        resizedImage2(i,j,k) = image2(oldX,oldY,k);
+                    }
+                }
+            }
+
+            Image imgCopy(maxWidth, maxHeight);
+
+            for (int i = 0; i < maxWidth; i++) {
+                for (int j = 0; j < maxHeight; j++) {
+                    for (int k = 0; k < 3; k++) {
+                        unsigned int avgColor =
+                            (resizedImage1(i,j,k) + resizedImage2(i,j,k)) / 2;
+                        imgCopy(i,j,k) = avgColor;
+                    }
+                }
+            }
+
+            return imgCopy;
+        }
+
+        case 2: {
+            int minWidth = min(image1.width, image2.width);
+            int minHeight = min(image1.height, image2.height);
+
+            Image imgCopy(minWidth, minHeight);
+
+            for (int i = 0; i < minWidth; i++) {
+                for (int j = 0; j < minHeight; j++) {
+                    for (int k = 0; k < 3; k++) {
+                        unsigned int avgColor =
+                            (image1(i,j,k) + image2(i,j,k)) / 2;
+                        imgCopy(i,j,k) = avgColor;
+                    }
+                }
+            }
+
+            return imgCopy;
+        }
+
+        default: {
+            cout << "Invalid choice" << endl;
+            return image1;
+        }
+    }
+}
+
 void detect_image(Image& image){
     black_and_white(image);
 
@@ -378,6 +484,22 @@ void bluur() {
     }
     blur.saveImage("oooooo.bmp");
 
+}
+
+void Sunlight(Image &image) {
+    for (int i = 0; i < image.width ; i++) {
+        for (int j = 0; j < image.height ; j++) {
+                int red = image(i,j,0) + 40;
+                int green = image(i,j,1) + 25;
+                int blue = image(i,j,2) - 10;
+            if (red > 255) red = 255;
+            if (green > 255) green = 255;
+            if (blue < 0) blue = 0;
+            image(i,j,0) = red;
+            image(i,j,1) = green;
+            image(i,j,2) = blue;
+        }
+    }
 }
 
 void old_tv_effect(Image& image){
@@ -617,19 +739,21 @@ int main()
     while (true) 
     {
         cout<<" <<<<< Filters >>>>> "<<endl;
-        cout<<"enter,your filter"<<endl;
+        cout<<" enter, your filter"<<endl;
 
         cout<<"1. GrayScale"<<endl;
         cout<<"2. Black_and_White"<<endl;
         cout<<"3. Invert Image"<< endl;
-        cout<<"4.Frame"<<endl;
+        cout<<"4. Frame"<<endl;
         cout<<"5. Flip"<<endl;
         cout<<"6. Rotate"<<endl;
         cout<<"7. Darken and Lighten"<<endl;
         cout<<"8. Resize"<<endl;
+        cout<<"9. Merge Images"<<endl;
         cout<<"10. Detect Image Edges"<< endl;
         cout<<"11. Crop Image"<<endl;
         cout<<"12. Blur Images"<<endl;
+        cout<<"13. Sunlight Filter"<<endl;
         cout<<"14. Old TV Effect"<<endl;
         cout<<"15. Purple Filter"<<endl;
         cout<<"16. Samurai Red"<<endl;
@@ -708,6 +832,25 @@ int main()
                 resize(image);
                 break;
 
+            case 9:
+            {
+                string name2;
+                Image image2;
+
+                cout << "Enter second image name: ";
+                cin >> name2;
+
+                if (image2.loadNewImage(name2))
+                {
+                    image = merge(image, image2);
+                    cout << "Images merged successfully!" << endl;
+                }
+               else
+                    cout << "Failed to load second image!" << endl;
+
+                break;
+            }
+
             case 10:
                 detect_image(image);
                 break;
@@ -719,6 +862,10 @@ int main()
             case 12:
                 bluur();
                 break;
+
+            case 13:
+                Sunlight(image);
+                break;    
 
             case 14:
                 old_tv_effect(image);

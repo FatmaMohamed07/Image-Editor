@@ -462,28 +462,26 @@ void CropImage(Image &image) {
     image = cutted;
 }
 
-void bluur() {
-    Image f12("fruit.bmp");
-    Image blur(f12.width,f12.height) ;
+void blur(Image &image) {
+    Image blur_res(image.width, image.height);
     int m[13][13];
-    for (int i = 0; i < f12.height; i++) {
-        for (int j = 0; j < f12.width; j++) {
+    for (int i = 0; i < image.height; i++) {
+        for (int j = 0; j < image.width; j++) {
             for (int k = 0; k < 3; k++) {
                 int sum = 0;
                 for (int x = -1; x <= 11; x++) {
                     for (int y = -1; y <= 11; y++) {
-                        if (x+i>=0 && x+i < f12.height && y+j < f12.width && y+j >=0 ) {
-                            sum += f12.getPixel(j+y,i+x,k);
+                        if (x + i >= 0 && x + i < image.height && y + j < image.width && y + j >= 0) {
+                            sum += image.getPixel(j + y, i + x, k);
                         }
                     }
                 }
-                int average = sum / 169 ;
-                blur.getPixel(j,i,k) = average;
+                int average = sum / 169;
+                blur_res.getPixel(j, i, k) = average;
             }
         }
     }
-    blur.saveImage("oooooo.bmp");
-
+    image = blur_res;
 }
 
 void Sunlight(Image &image) {
@@ -553,27 +551,23 @@ void PurpleFilterImage(Image& img) {
     }
 }
 
-void samurai_red(){
-    Image f16("samurai.jpg");
-    for (int i=0;i<f16.width;i++) {
-        for (int j=0;j<f16.height;j++) {
-            int r = f16(i , j , 0);
-            int g = f16(i , j , 1);
-            int b = f16(i , j , 2);
-            int blackcol = ((r+g+b)/3) ;
+void samurai_red(Image &image) {
+    for (int i = 0; i < image.width; i++) {
+        for (int j = 0; j < image.height; j++) {
+            int r = image(i, j, 0);
+            int g = image(i, j, 1);
+            int b = image(i, j, 2);
+            int blackcol = ((r + g + b) / 3);
 
-            int newr = 255;          //max(0, min(255,(int)(blackcol * 1.2) + 60));
-            int newg = 255-blackcol; //max(0, min(255,(int)(blackcol * 1.1)+10 ));
-            int newb = 255-blackcol; //max(0, min(255,(int)(blackcol * 0.5)-20 ));
+            int newr = 255;          
+            int newg = 255 - blackcol; 
+            int newb = 255 - blackcol; 
 
-            f16(i, j, 0) = newr;
-            f16(i, j, 1) = newg;
-            f16(i,j,2) = newb;
-
+            image(i, j, 0) = newr;
+            image(i, j, 1) = newg;
+            image(i, j, 2) = newb;
         }
     }
-    f16.saveImage("samurai_f16.jpg");
-
 }
 
 void skew_image(Image& image, double angle)
@@ -855,7 +849,7 @@ int main()
                 break;
 
             case 12:
-                bluur();
+                blur(image);
                 break;
 
             case 13:
@@ -871,12 +865,17 @@ int main()
                 break;    
 
             case 16:
-                samurai_red();
+                samurai_red(image);
                 break;
 
             case 17:
-                skew_image(image);
+            {
+                double angle;
+                cout << "Enter skew angle (in degrees): ";
+                cin >> angle;
+                skew_image(image, angle);
                 break;
+            }
 
             case 18:
                 oilpainting(image);
